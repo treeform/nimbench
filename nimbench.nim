@@ -1,6 +1,6 @@
 import os, osproc, re, strutils, times, strformat
 
-const 
+const
   nimPath = "/p/Nim/bin/nim"
 
 proc bench(name, key, compileParams, programParams: string) =
@@ -27,19 +27,21 @@ proc bench(name, key, compileParams, programParams: string) =
     echo name, ",", key, ", ", epochTime() - start
 
 proc bench(name: string, compileParams = "", programParams = "") =
-  for releaseType in @["release", "danger"]: 
-    for compileType in @["js", "c", "cpp"]:
-      if compileType == "js": 
+  for releaseType in @["release", "danger"]:
+    for compileType in @["c"]: #"js" "cpp"
+      if compileType == "js":
         bench(name, compileType & "," & releaseType & ",,,", &"{compileType} -d:{releaseType}", programParams)
-      else:        
+      else:
         for gcType in @["refc", "arc"]:
-          for compilerType in @["clang", "gcc"]:
-            var exceptionTypes = @["goto", "setjmp"]
-            if compileType == "cpp":
-              exceptionTypes.add "cpp"
-            for exceptionType in exceptionTypes:
-              bench(name, compileType & "," & releaseType & "," & exceptionType & "," & gcType & "," & compilerType, &"{compileType} -d:{releaseType} --cc:{compilerType} --gc:{gcType} --exceptions:{exceptionType} {compileParams}", programParams)
-              
+          for compilerType in @["gcc"]: # "clang", "gcc"
+            #var exceptionTypes = @["goto", "setjmp"]
+            #if compileType == "cpp":
+            #  exceptionTypes.add "cpp"
+            #for exceptionType in exceptionTypes:
+            # --exceptions:{exceptionType}
+            # & exceptionType & ","
+            bench(name, compileType & "," & releaseType & "," & gcType & "," & compilerType, &"{compileType} -d:{releaseType} --cc:{compilerType} --gc:{gcType} {compileParams}", programParams)
+
 
 bench "benchmarks/b64"
 # bench "benchmarks/bf"
